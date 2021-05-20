@@ -1,45 +1,44 @@
 package application;
 
+import gui.GameScreen;
 import gui.mainMenu;
-import input.InputUtility;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import logic.Game;
+import logic.GameLogic;
+import sharedObject.RenderableHolder;
 
 public class Main extends Application{
 	
-	public final static int WIDTH = 800;
-	public final static int HEIGHT = 600;
-	
-	
-	private Pane mainMenu = new mainMenu();
-	private Pane root = new Pane();
-	
-	private Parent startGame()
-	{
-		AnimationTimer timer = new AnimationTimer() {
-		Game game = new Game();
-			@Override
-			public void handle(long now) {
-				game.update();
-			}
-		};
-		
-		timer.start();
-		
-		return root;
-	}
+	public final static int WIDTH = 640;
+	public final static int HEIGHT = 480;
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception 
 	{
-		primaryStage.setTitle("GameProj");
-		primaryStage.sizeToScene();
-		primaryStage.setResizable(false);
+		StackPane root = new StackPane();
+		Scene scene = new Scene(root);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Asteriod");
+		
+		GameLogic logic = new GameLogic();
+		GameScreen gameScreen = new GameScreen(WIDTH, HEIGHT);
+		root.getChildren().add(gameScreen);
+		gameScreen.requestFocus();
+		
 		primaryStage.show();
+		
+		AnimationTimer animation = new AnimationTimer() {
+			public void handle(long now) {
+				gameScreen.paintComponent();
+				logic.logicUpdate();
+				RenderableHolder.getInstance().update();
+			}
+		};
+		animation.start();
 	}
 	
 	public static void main(String[] args) 

@@ -25,8 +25,6 @@ public class mainMenu extends StackPane {
 		Canvas canvas = new Canvas(Main.WIDTH,Main.HEIGHT);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		Universe uni = new Universe();
-		
 		Background bg = new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY));
 		
 		this.getChildren().add(canvas);

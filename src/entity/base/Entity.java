@@ -1,5 +1,11 @@
 package entity.base;
 
+/**
+ * Created by: Punya Gunawardana
+ * Date created: Aprill 23, 2021
+ * Time created: 9:21 AM
+ */
+
 import sharedObject.IRenderable;
 
 public abstract class Entity implements IRenderable{
@@ -27,4 +33,22 @@ public abstract class Entity implements IRenderable{
 	public int getZ(){
 		return z;
 	}
+
+	public double getX() {
+		return x;
+	}
+
+	public void setX(double x) {
+		this.x = x;
+	}
+
+	public double getY() {
+		return y;
+	}
+
+	public void setY(double y) {
+		this.y = y;
+	}
+	
+	
 }

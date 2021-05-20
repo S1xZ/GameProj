@@ -2,36 +2,40 @@ package entity;
 
 import application.Main;
 import entity.base.CollidableEntity;
-import entity.base.Entity;
-import entity.base.IKillable;
-import sharedObject.IRenderable;
-
 import input.InputUtility;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.transform.Rotate;
+import logic.Sprites;
 
 public class Player extends CollidableEntity {
 	
 	private final static int MAXSPEED = 2;
+	private final static int SHOOTCOOLDOWN = 40;
+	private static Image sprite = Sprites.PLAYERSTATIC_SPRITE;
+	
 	
 	private float accel = (float) 0.05;
 	private float decel = (float) 0.01;
 	
-	private boolean shoot = false;
-	
 	private float speed = 0;
 	private int speed_angle = 0;
-	public int angle = 0; // angle 0 = EAST
-
+	public int angle = 0;
+	private int cooldown = 0;
+	
 	private boolean flashing = false;
 	private int flashCounter = 0;
 	private int flashDurationCounter = 0;
-
+	
 	public Player(double x, double y) {
 		this.x = x;
 		this.y = y;
+		this.radius = (int) (sprite.getWidth()/2);
+		this.health = 5;
+		System.out.println(this.isVisible());
 	}
 
 	private void forward() {
@@ -50,15 +54,20 @@ public class Player extends CollidableEntity {
 				angle -= 360;
 		}
 	}
-
-	public void hitByMine() {
+	
+	@Override
+	public void hit() {
 		flashing = true;
-		flashCounter = 10;
-		flashDurationCounter = 10;
+		health--;
+		if(health <= 0) {
+			this.destroyed = true;
+		}
+		flashCounter = 20;
+		flashDurationCounter = 20;
 	}
-
+	
+	@Override
 	public void update() {
-		double t = 1;
 		if (flashing) {
 			if (flashCounter == 0) {
 				this.visible = true;
@@ -73,29 +82,23 @@ public class Player extends CollidableEntity {
 					flashCounter--;
 				}
 			}
-		} else {
-			this.visible = !InputUtility.getKeyPressed(KeyCode.SHIFT);
-		}
+		} 
+		
 		if (InputUtility.getKeyPressed(KeyCode.W)) {
 			if(speed < MAXSPEED)
 			{
-				
 				speed += accel;
 			}
 			speed_angle = this.angle;
+			sprite = Sprites.PLAYERMOVING_SPRITE;
 			forward();
-		}
-		if (InputUtility.getKeyPressed(KeyCode.J)) {
-			shoot = true;
+		} else {
+			sprite = Sprites.PLAYERSTATIC_SPRITE;
 		}
 		if (InputUtility.getKeyPressed(KeyCode.A)) {
 			turn(true);
 		} else if (InputUtility.getKeyPressed(KeyCode.D)) {
 			turn(false);
-		}
-		if (InputUtility.isLeftClickTriggered()) {
-			this.x = InputUtility.mouseX;
-			this.y = InputUtility.mouseY;
 		}
 		if (speed > 0 && !InputUtility.getKeyPressed(KeyCode.W))
 		{
@@ -122,12 +125,60 @@ public class Player extends CollidableEntity {
 		{
 			this.y = Main.HEIGHT;
 		}
-		
+		if(cooldown > 0) {
+		cooldown--;
+		}
 	}
-
+	
+	public boolean canShoot() {
+		if (InputUtility.getKeyPressed(KeyCode.J) && cooldown <= 0 && !destroyed) {
+			cooldown = SHOOTCOOLDOWN;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public double getX() {
+		return x;
+	}
+	
+	public double getY() {
+		return y;
+	}
+	public double getAngle() {
+		return angle;
+	}
+	
+	public double getRadius() {
+		return radius;
+	}
+	
+	public boolean getFlashing() {
+		return flashing;
+	}
+	
 	@Override
 	public void draw(GraphicsContext gc) {
-		
+		//HITBOX
+//		gc.setFill(Color.TRANSPARENT);
+//		gc.fillArc(x - radius, y - radius, radius * 2, radius * 2, 0, 360, ArcType.OPEN);
+		gc.translate(x, y);
+		gc.rotate(angle);
+		gc.drawImage(sprite, -8, -8, 16, 16);
+		gc.rotate(-angle);
+		gc.translate(-x, -y);
+	}
+	
+	public int getHealth()
+	{
+		return health;
+	}
+	
+	public void setHealth(int health)
+	{
+		this.health = health;
 	}
 
 }

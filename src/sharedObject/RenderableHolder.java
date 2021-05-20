@@ -13,13 +13,6 @@ public class RenderableHolder {
 
 	private List<IRenderable> entities;
 	private Comparator<IRenderable> comparator;
-	public static Image mapSprite;
-	public static Image mineSprite;
-	public static AudioClip  explosionSound;
-
-	static {
-		loadResource();
-	}
 
 	public RenderableHolder() {
 		entities = new ArrayList<IRenderable>();
@@ -34,19 +27,9 @@ public class RenderableHolder {
 		return instance;
 	}
 
-	public static void loadResource() {
-		mapSprite = new Image(ClassLoader.getSystemResource("Map.png").toString());
-		mineSprite = new Image(ClassLoader.getSystemResource("Mine.png").toString());
-		explosionSound = new AudioClip(ClassLoader.getSystemResource("Explosion.wav").toString());
-	}
-
 	public void add(IRenderable entity) {
-		System.out.println("add");
 		entities.add(entity);
 		Collections.sort(entities, comparator);
-		for(IRenderable x: entities){
-			
-		}
 	}
 
 	public void update() {
